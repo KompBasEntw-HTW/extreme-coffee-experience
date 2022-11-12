@@ -1,6 +1,13 @@
 services:
   products:
-    build: 
+    build:
       dockerfile: Dockerfile.dev
     volumes:
       - ./products/src:/app/src
+
+  online-shop:
+    build:
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./online-shop:/app
+      - /app/node_modules
