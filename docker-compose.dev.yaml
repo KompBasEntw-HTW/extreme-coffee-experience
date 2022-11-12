@@ -1,0 +1,6 @@
+services:
+  products:
+    build: 
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./products/src:/app/src

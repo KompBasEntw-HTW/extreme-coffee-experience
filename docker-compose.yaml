@@ -16,13 +16,12 @@ services:
   products:
     build:
       context: products
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     networks:
       - backend
-    volumes:
-      - ./products/src:/app/src
+
 
   pgadmin:
     container_name: pgadmin_container
