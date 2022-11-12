@@ -1,5 +1,5 @@
 # extreme-coffee-experience
-Deployment repo Extreme Coffee Experience.  
+Deployment/development repo Extreme Coffee Experience.  
 Includes all microservices as submodules and the the deployment files.  
 
 To start up application in production mode run:  
