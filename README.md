@@ -2,6 +2,20 @@
 Deployment/development repo Extreme Coffee Experience.  
 Includes all microservices as submodules and the the deployment files.  
 
+To pull this repository including all submodules you need to run:
+
+```console
+git clone --recurse-submodules git@github.com:KompBasEntw-HTW/extreme-coffee-experience.git
+```
+
+To get changes in all submodules in future pulls from main repo run: 
+```console
+git config --global submodule.recurse true
+```
+
+Submodules are their own repositories. They have their own commit history and everything. You can therefore use your own git workflow inside of them.
+To reflect the changes done in a submodule you have to commit them to this repository, so this repo when updated from somewhere else, points to the desired version of the submodule. You can always do it after closing a pull request or implenting a feature. 
+
 To start up application in production mode run:  
 ```console
 docker compose -f docker-compose.yaml up --build -d
