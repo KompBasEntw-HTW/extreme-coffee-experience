@@ -1,5 +1,4 @@
 services:
-
   online-shop:
     build:
       context: online-shop
@@ -27,26 +26,62 @@ services:
     build:
       context: products
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
     networks:
       - backend
+    labels:
+      - traefik.http.routers.products.rule=PathPrefix("/api/products/")
+      - traefik.http.routers.products.middlewares=products
+      - traefik.http.middlewares.products.stripprefix.prefixes=/api/products/
+      - traefik.http.middlewares.products.stripprefix.forceslash=false
+      - traefik.http.services.products.loadbalancer.server.port=8080
 
   pgadmin:
-    container_name: pgadmin_container
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-      PGADMIN_CONFIG_SERVER_MODE: '`False'
+      # PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
       - pgadmin:/var/lib/pgadmin
-
-    ports:
-      - "${PGADMIN_PORT:-5050}:80"
+    # ports:
+    #   - "${PGADMIN_PORT:-5050}:80"
     networks:
       - backend
     restart: unless-stopped
+    labels:
+      - traefik.http.routers.pgadmin.rule=PathPrefix("/pgadmin")
+      - traefik.http.routers.pgadmin.middlewares=pgadmin
+      - traefik.http.middlewares.pgadmin.stripprefix.prefixes=/pgadmin
+      - traefik.http.middlewares.pgadmin.stripprefix.forceslash=false
+      - traefik.http.services.pgadmin.loadbalancer.server.port=80
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    environment:
+      URLS: "[{ url: \"http://localhost/api/products/v3/api-docs\", name: \"Products\" },]"
+    networks:
+      - backend
+    labels:
+      - traefik.http.routers.swagger-ui.rule=PathPrefix("/api")
+      - traefik.http.routers.swagger-ui.middlewares=swagger-ui
+      - traefik.http.middlewares.swagger-ui.stripprefix.prefixes=/api
+      - traefik.http.middlewares.swagger-ui.stripprefix.forceslash=false
+      - traefik.http.services.swagger-ui.loadbalancer.server.port=8080
+
+  reverse-proxy:
+    image: traefik:v2.9
+    command:
+      - --api.insecure=true
+      # - --log.level=DEBUG
+      - --providers.docker=true
+      - --log.format=json
+    ports:
+      - 80:80
+      - 8080:8080
+    networks:
+      - backend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
 networks:
   backend:
