@@ -1,13 +1,14 @@
 services:
-  products:
-    build:
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./products/src:/app/src
-
   online-shop:
     build:
       dockerfile: Dockerfile.dev
     volumes:
       - ./online-shop:/app
       - /app/node_modules
+
+  products:
+    environment:
+      QUARKUS_LAUNCH_DEVMODE: true
+    ports:
+      - 8082:8080
+    

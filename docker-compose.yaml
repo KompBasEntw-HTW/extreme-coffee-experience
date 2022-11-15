@@ -1,71 +1,63 @@
 services:
+  products:
+    build: 
+      context: products
+      dockerfile: src/main/docker/Dockerfile.jvm
+    networks:
+      - backend
+    labels:
+      - traefik.http.routers.quarkus.rule=PathPrefix("/api/products")
+      - traefik.http.services.quarkus.loadbalancer.server.port=8080
+      
   online-shop:
     build:
       context: online-shop
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
     networks:
-      - frontend
+      - backend
+    labels:
+      - traefik.http.routers.online-shop.rule=PathPrefix("/")
+      - traefik.http.services.online-shop.loadbalancer.server.port=3000
 
-  products-db:
+  postgres:
     image: postgres:alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       PGDATA: /data/postgres
     volumes:
-      - products-db:/data/postgres
+      - postgres:/data/postgres
     ports:
       - "5432:5432"
     networks:
       - backend
     restart: unless-stopped
 
-  products:
-    build:
-      context: products
-      dockerfile: Dockerfile
-    networks:
-      - backend
-    labels:
-      - traefik.http.routers.products.rule=PathPrefix("/api/products/")
-      - traefik.http.routers.products.middlewares=products
-      - traefik.http.middlewares.products.stripprefix.prefixes=/api/products/
-      - traefik.http.middlewares.products.stripprefix.forceslash=false
-      - traefik.http.services.products.loadbalancer.server.port=8080
-
   pgadmin:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-      # PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_DEFAULT_EMAIL: postgres@postgres.de
+      PGADMIN_DEFAULT_PASSWORD: postgres
+      SCRIPT_NAME: /pgadmin4
     volumes:
       - pgadmin:/var/lib/pgadmin
-    # ports:
-    #   - "${PGADMIN_PORT:-5050}:80"
     networks:
       - backend
     restart: unless-stopped
     labels:
-      - traefik.http.routers.pgadmin.rule=PathPrefix("/pgadmin")
-      - traefik.http.routers.pgadmin.middlewares=pgadmin
-      - traefik.http.middlewares.pgadmin.stripprefix.prefixes=/pgadmin
-      - traefik.http.middlewares.pgadmin.stripprefix.forceslash=false
-      - traefik.http.services.pgadmin.loadbalancer.server.port=80
+      - traefik.http.routers.pgadmin.rule=PathPrefix("/pgadmin4")
+    tty: true
+
 
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      URLS: "[{ url: \"http://localhost/api/products/v3/api-docs\", name: \"Products\" },]"
+      URLS: "[{ url: \"http://localhost/api/products/q/openapi\", name: \"Products\" },]"
+      BASE_URL: /api/swagger-ui
     networks:
       - backend
     labels:
-      - traefik.http.routers.swagger-ui.rule=PathPrefix("/api")
-      - traefik.http.routers.swagger-ui.middlewares=swagger-ui
-      - traefik.http.middlewares.swagger-ui.stripprefix.prefixes=/api
-      - traefik.http.middlewares.swagger-ui.stripprefix.forceslash=false
+      - traefik.http.routers.swagger-ui.rule=PathPrefix("/api/swagger-ui")
       - traefik.http.services.swagger-ui.loadbalancer.server.port=8080
 
   reverse-proxy:
@@ -90,5 +82,5 @@ networks:
     driver: bridge
 
 volumes:
-  products-db:
+  postgres:
   pgadmin:
