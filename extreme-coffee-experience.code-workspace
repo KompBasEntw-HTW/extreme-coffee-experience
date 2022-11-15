@@ -21,15 +21,5 @@
 		{
 			"path": "user"
 		}
-	],
-	"settings": {
-		"files.exclude": {
-			"products": true,
-			"user": true,
-			"payment": true,
-			"checkout": true,
-			"online-shop": true,
-			"basket": true
-		},
-	}
+	]
 }
