@@ -9,6 +9,7 @@ services:
     labels:
       - traefik.http.routers.quarkus.rule=PathPrefix("/api/products")
       - traefik.http.services.quarkus.loadbalancer.server.port=8080
+      - traefik.docker.network=backend
       
   online-shop:
     build:
