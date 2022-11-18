@@ -16,6 +16,19 @@ git config --global submodule.recurse true
 Submodules are their own repositories. They have their own commit history and everything. You can therefore use your own git workflow inside of them.
 To reflect the changes done in a submodule you have to commit them to this repository, so this repo when updated from somewhere else, points to the desired version of the submodule. You can always do it after closing a pull request or implenting a feature. 
 
+There is a simple shell script called `run-local-dev.sh` to startup the application in development mode.
+Just run:
+
+```console
+./run-local-dev.sh
+```
+
+If you want to connect your backend microservice dev server to the docker container just specify which service you want to have hot reloading on e.g:
+```console
+./run-local-dev.sh products
+```
+
+
 To start up application in production mode run:  
 ```console
 docker compose -f docker-compose.yaml up --build -d
