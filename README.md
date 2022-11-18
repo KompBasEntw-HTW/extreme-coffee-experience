@@ -27,8 +27,7 @@ If you want to connect your backend microservice dev server to the docker contai
 ```console
 ./run-local-dev.sh products
 ```
-
-
+<!---
 To start up application in production mode run:  
 ```console
 docker compose -f docker-compose.yaml up --build -d
@@ -42,3 +41,4 @@ docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d
 ```
 
 If you add any new dependencies you need to add the `--build` flag.
+-->
