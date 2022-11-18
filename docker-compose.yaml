@@ -5,6 +5,7 @@ services:
       dockerfile: src/main/docker/Dockerfile.jvm
     networks:
       - backend
+      - products
     labels:
       - traefik.http.routers.quarkus.rule=PathPrefix("/api/products")
       - traefik.http.services.quarkus.loadbalancer.server.port=8080
@@ -19,18 +20,17 @@ services:
       - traefik.http.routers.online-shop.rule=PathPrefix("/")
       - traefik.http.services.online-shop.loadbalancer.server.port=3000
 
-  postgres:
+  products-db:
     image: postgres:alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: products
       PGDATA: /data/postgres
     volumes:
-      - postgres:/data/postgres
-    ports:
-      - "5432:5432"
+      - products-db:/data/postgres
     networks:
-      - backend
+      - products
     restart: unless-stopped
 
   pgadmin:
@@ -52,7 +52,7 @@ services:
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      URLS: "[{ url: \"http://localhost/api/products/q/openapi\", name: \"Products\" },]"
+      URLS: "[{ url: \"/api/products/q/openapi\", name: \"Products\" },]"
       BASE_URL: /api/swagger-ui
     networks:
       - backend
@@ -80,7 +80,9 @@ networks:
     driver: bridge
   frontend:
     driver: bridge
+  products:
+    driver: bridge
 
 volumes:
-  postgres:
+  products-db:
   pgadmin:
