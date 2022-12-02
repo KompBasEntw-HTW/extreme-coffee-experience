@@ -75,6 +75,10 @@ services:
       - backend
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+  
+  cache:
+    image: redis
+    command: redis-server
 
 networks:
   backend:
