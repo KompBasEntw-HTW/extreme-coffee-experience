@@ -13,12 +13,16 @@ To get changes in all submodules in future pulls from main repo run:
 git config --global submodule.recurse true
 ```
 
+To be ablo to commit you need to first install commitlint in this repo. Just run:
+```console
+npm install
+```
+
 Submodules are their own repositories. They have their own commit history and everything. You can therefore use your own git workflow inside of them.
 To reflect the changes done in a submodule you have to commit them to this repository, so this repo when updated from somewhere else, points to the desired version of the submodule. You can always do it after closing a pull request or implenting a feature. 
 
 There is a simple shell script called `run-local-dev.sh` to startup the application in development mode.
 Just run:
-
 ```console
 ./run-local-dev.sh
 ```
@@ -27,6 +31,8 @@ If you want to connect your backend microservice dev server to the docker contai
 ```console
 ./run-local-dev.sh products
 ```
+
+
 <!---
 To start up application in production mode run:  
 ```console
