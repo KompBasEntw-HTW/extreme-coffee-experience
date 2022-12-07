@@ -1,25 +1,26 @@
 services:
   products:
-    build: 
+    build:
       context: products
       dockerfile: src/main/docker/Dockerfile.jvm
     networks:
-      - backend
+      - traefik
       - products
     labels:
       - traefik.http.routers.quarkus.rule=PathPrefix("/api/products")
       - traefik.http.services.quarkus.loadbalancer.server.port=8080
-      - traefik.docker.network=backend
-      
+      - traefik.docker.network=traefik
+
   online-shop:
     build:
       context: online-shop
       dockerfile: Dockerfile
     networks:
-      - backend
+      - traefik
     labels:
       - traefik.http.routers.online-shop.rule=PathPrefix("/")
       - traefik.http.services.online-shop.loadbalancer.server.port=3000
+      - traefik.docker.network=traefik
 
   products-db:
     image: postgres:alpine
@@ -43,23 +44,24 @@ services:
     volumes:
       - pgadmin:/var/lib/pgadmin
     networks:
-      - backend
+      - traefik
     restart: unless-stopped
     labels:
       - traefik.http.routers.pgadmin.rule=PathPrefix("/pgadmin4")
+      - traefik.docker.network=traefik
     tty: true
-
 
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      URLS: "[{ url: \"/api/products/q/openapi\", name: \"Products\" },]"
+      URLS: '[{ url: "/api/products/q/openapi", name: "Products" },]'
       BASE_URL: /api/swagger-ui
     networks:
-      - backend
+      - traefik
     labels:
       - traefik.http.routers.swagger-ui.rule=PathPrefix("/api/swagger-ui")
       - traefik.http.services.swagger-ui.loadbalancer.server.port=8080
+      - traefik.docker.network=traefik
 
   reverse-proxy:
     image: traefik:v2.9
@@ -72,20 +74,29 @@ services:
       - 80:80
       - 8080:8080
     networks:
-      - backend
+      - traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-  
+
+  rabbitmq:
+    image: rabbitmq:management
+    environment:
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbitmq_management path_prefix "/management/rabbitmq/"
+    labels:
+      - traefik.http.routers.rabbitmq.rule=PathPrefix("/management/rabbitmq/")
+      - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+      - traefik.docker.network=traefik
+    networks:
+      - traefik
+
   cache:
     image: redis
     command: redis-server
 
 networks:
-  backend:
-    driver: bridge
-  frontend:
-    driver: bridge
   products:
+    driver: bridge
+  traefik:
     driver: bridge
 
 volumes:
