@@ -11,4 +11,3 @@ services:
       QUARKUS_LAUNCH_DEVMODE: true
     ports:
       - 8082:8080
-    
