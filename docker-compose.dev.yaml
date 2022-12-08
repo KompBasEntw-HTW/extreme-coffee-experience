@@ -30,3 +30,4 @@ services:
 networks:
   traefik:
     driver: bridge
+    name: traefik
