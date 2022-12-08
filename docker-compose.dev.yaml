@@ -11,3 +11,22 @@ services:
       QUARKUS_LAUNCH_DEVMODE: true
     ports:
       - 8082:8080
+
+  reverse-proxy:
+    image: traefik
+    command:
+      - --api.insecure=true
+      # - --log.level=DEBUG
+      - --providers.docker=true
+      - --log.format=json
+    ports:
+      - 80:80
+      - 8080:8080
+    networks:
+      - traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+networks:
+  traefik:
+    driver: bridge
