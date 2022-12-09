@@ -7,8 +7,9 @@ services:
       - traefik
       - products
     labels:
+      - traefik.enable=true
       - traefik.docker.network=traefik
-      - traefik.http.routers.products.rule=(Host("localhost") || Host("exe.dlugoschvincent.de")) && PathPrefix("/api/product-service")
+      - traefik.http.routers.products.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/api/product-service")
       - traefik.http.services.products.loadbalancer.server.port=8080
       - traefik.http.middlewares.products-stripprefix.stripprefix.prefixes=/api/product-service
       - traefik.http.routers.products.middlewares=products-stripprefix
@@ -20,6 +21,7 @@ services:
     networks:
       - traefik
     labels:
+      - traefik.enable=true
       - traefik.docker.network=traefik
       - traefik.http.routers.online-shop.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/")
       - traefik.http.services.online-shop.loadbalancer.server.port=3000
@@ -50,6 +52,7 @@ services:
       - products
     restart: unless-stopped
     labels:
+      - traefik.enable=true
       - traefik.docker.network=traefik
       - traefik.http.routers.pgadmin.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/management/pgadmin")
 
@@ -61,6 +64,7 @@ services:
     networks:
       - traefik
     labels:
+      - traefik.enable=true
       - traefik.docker.network=traefik
       - traefik.http.routers.swagger-ui.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/api/swagger-ui")
       - traefik.http.services.swagger-ui.loadbalancer.server.port=8080
@@ -69,6 +73,7 @@ services:
   rabbitmq:
     image: rabbitmq:management
     labels:
+      - traefik.enable=true
       - traefik.docker.network=traefik
       - traefik.http.routers.rabbitmq.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/management/rabbitmq/")
       - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
