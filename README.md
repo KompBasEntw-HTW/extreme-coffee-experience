@@ -8,9 +8,19 @@ To pull this repository including all submodules you need to run:
 git clone --recurse-submodules git@github.com:KompBasEntw-HTW/extreme-coffee-experience.git
 ```
 
-To get changes in all submodules in future pulls from main repo run: 
+~~To get changes in all submodules in future pulls from main repo run:~~ 
+```diff
+- git config --global submodule.recurse true
+```
+
+My bad please turn this off again with
 ```console
-git config --global submodule.recurse true
+git config --global submodule.recurse false
+```
+
+To update all submodule to latest commit on main branch run 
+```console
+git submodule foreach git pull origin master
 ```
 
 To be ablo to commit you need to first install commitlint in this repo. Just run:
