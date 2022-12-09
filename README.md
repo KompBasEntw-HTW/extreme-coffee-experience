@@ -18,9 +18,14 @@ My bad please turn this off again with
 git config --global submodule.recurse false
 ```
 
-To update all submodule to latest commit on main branch run 
+Switch all submodules to main branch
 ```console
-git submodule foreach git pull origin main
+git submodule foreach git switch main
+```
+
+To update all submodule to latest commit on branch run 
+```console
+git submodule foreach git pull
 ```
 
 To be ablo to commit you need to first install commitlint in this repo. Just run:
