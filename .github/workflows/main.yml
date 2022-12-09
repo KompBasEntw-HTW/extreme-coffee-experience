@@ -1,0 +1,17 @@
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    name: Deploy on server
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@main
+      - name: Pull and update all submodules
+        run: |
+          git submodule foreach git pull origin main
+          sh run-prod.sh
+    
+  
