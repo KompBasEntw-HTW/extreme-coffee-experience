@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@main
         with:
           ssh-known-hosts: github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
-          ssh-key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCQVAkX1VGKxAojUSghQ/urPqqC9VLIcFvKn7iSj9skLajJ3FeuxupRQYEoAuMJPp8/QI+x14PgCl9YH67G913ZsYpoLn0Cb089oaRTLFF/fZUGXYHefWRx64e9gOn2p1ZH8b7+k1NawhiTqgymXDoASQNHR3BtsaHeFDWuwZDtt188lyXvQNFojvHnfRfjFL6Ol7kz5xIcF9e6M//QjHiRVBI8XwgZ40IFgM+YnDWgVKbCI5be3gMFgX31WaMSj8+4cKh08CNVSoSpxHX0k1oqqid2bm4h0CUYZUWFYacXRknVICAa3Sd2yUu1tZHjgYTHic4pUAWiTk0UWETD2OnChE00arJ38tYb3KraasWXYiuRJ0fncjm22G+Bxyg/0a+mV3Ul+y93Jue6T7eGVIPl5q14JDBOFUv6K41YvQEQXr3T0EIGxw8uzrYXA+ij2CM0Uzm9KVJafXXfiQ3FgVe3Si+bb8T/+xG1ff1LQGYJccaR6HDeKmWmL7u7emgAgUk= v@vmd104605
+          ssh-key: ${{ secrets.SSH_KEY_SUBMODULE_FETCH }}
           submodules: recursive      
       - name: Deploy application
         run: sh run-prod.sh
