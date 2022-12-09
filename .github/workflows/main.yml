@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    name: Deploy on server
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@main
+        with:
+          ssh-known-hosts: github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+          ssh-key: ${{ secrets.SSH_KEY_SUBMODULE_FETCH }}
+          submodules: recursive      
+      - name: Deploy application
+        run: sh run-prod.sh
+          
+    
+  
