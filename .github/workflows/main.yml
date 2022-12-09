@@ -10,6 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@main
         with:
+          ssh-key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDOl698HHstF+dKUmfZX05iW7dLiGWcTw+w6M1A/5dA1PLaaH33VJJkDZ82XYGnxYAeE1yyHAHFriN6pmD5xV8eS4yAKmlzv8PUsXakE0PpaslICHdelqdTrcccjOFgzRDQ6BKO4so+Xh1dqtxGHhf/TSy73kZfy6V/U7sLEMLwZrxcpwUg9pntzZZJFdEJ+25QUPlQxYnk0715Q/8JUdnzNt9bKnULA0EjCIxzusXYmMuG6Fvj3P0c2Y0sE8IhvKWkkgKtwSdystBExBsxE0/x1u43jnozTdjYGkoe0ejeNxfpwBGG9xC6UdrwIAadE63E9DE9R7VEsyJz7yKI0W1igJzjFZy/C3UdiWmvImw2gEmTrfqq7BVxjMEKRjNTcbJLXxZt8xqa7zY3KurZ1t2AV5ycKxDsU726fKBYw2u03oHU+gGYjdALCI37OjJF2ez7cGlvoh3Mp+dBgUoJLqFE9/e7mfvzeJpriNw9pdiiogjgNgSQHI2GJJ7Bbm+flHU= v@vmd104605
           submodules: recursive      
       - name: Deploy application
         run: sh run-prod.sh
