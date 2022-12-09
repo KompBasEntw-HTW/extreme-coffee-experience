@@ -20,7 +20,7 @@ git config --global submodule.recurse false
 
 To update all submodule to latest commit on main branch run 
 ```console
-git submodule foreach git pull origin master
+git submodule foreach git pull origin main
 ```
 
 To be ablo to commit you need to first install commitlint in this repo. Just run:
