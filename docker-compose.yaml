@@ -7,9 +7,12 @@ services:
       - traefik
       - products
     labels:
-      - traefik.http.routers.quarkus.rule=PathPrefix("/api/products")
-      - traefik.http.services.quarkus.loadbalancer.server.port=8080
+      - traefik.enable=true
       - traefik.docker.network=traefik
+      - traefik.http.routers.products.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/api/product-service")
+      - traefik.http.services.products.loadbalancer.server.port=8080
+      - traefik.http.middlewares.products-stripprefix.stripprefix.prefixes=/api/product-service
+      - traefik.http.routers.products.middlewares=products-stripprefix
 
   online-shop:
     build:
@@ -18,19 +21,20 @@ services:
     networks:
       - traefik
     labels:
-      - traefik.http.routers.online-shop.rule=PathPrefix("/")
-      - traefik.http.services.online-shop.loadbalancer.server.port=3000
+      - traefik.enable=true
       - traefik.docker.network=traefik
+      - traefik.http.routers.online-shop.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/")
+      - traefik.http.services.online-shop.loadbalancer.server.port=3000
 
-  products-db:
-    image: postgres:alpine
+  productdb:
+    image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: products
       PGDATA: /data/postgres
     volumes:
-      - products-db:/data/postgres
+      - productdb:/data/postgres
     networks:
       - products
     restart: unless-stopped
@@ -40,52 +44,41 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: postgres@postgres.de
       PGADMIN_DEFAULT_PASSWORD: postgres
-      SCRIPT_NAME: /pgadmin4
+      SCRIPT_NAME: /management/pgadmin
     volumes:
       - pgadmin:/var/lib/pgadmin
     networks:
       - traefik
+      - products
     restart: unless-stopped
     labels:
-      - traefik.http.routers.pgadmin.rule=PathPrefix("/pgadmin4")
+      - traefik.enable=true
       - traefik.docker.network=traefik
-    tty: true
+      - traefik.http.routers.pgadmin.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/management/pgadmin")
 
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      URLS: '[{ url: "/api/products/q/openapi", name: "Products" },]'
+      URLS: '[{ url: "/api/product-service/q/openapi", name: "Products" },]'
       BASE_URL: /api/swagger-ui
     networks:
       - traefik
     labels:
-      - traefik.http.routers.swagger-ui.rule=PathPrefix("/api/swagger-ui")
-      - traefik.http.services.swagger-ui.loadbalancer.server.port=8080
+      - traefik.enable=true
       - traefik.docker.network=traefik
+      - traefik.http.routers.swagger-ui.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/api/swagger-ui")
+      - traefik.http.services.swagger-ui.loadbalancer.server.port=8080
 
-  reverse-proxy:
-    image: traefik:v2.9
-    command:
-      - --api.insecure=true
-      # - --log.level=DEBUG
-      - --providers.docker=true
-      - --log.format=json
-    ports:
-      - 80:80
-      - 8080:8080
-    networks:
-      - traefik
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   rabbitmq:
     image: rabbitmq:management
-    environment:
-      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbitmq_management path_prefix "/management/rabbitmq/"
     labels:
-      - traefik.http.routers.rabbitmq.rule=PathPrefix("/management/rabbitmq/")
-      - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+      - traefik.enable=true
       - traefik.docker.network=traefik
+      - traefik.http.routers.rabbitmq.rule=Host("localhost", "exe.dlugoschvincent.de") && PathPrefix("/management/rabbitmq/")
+      - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+      - traefik.http.middlewares.rabbitmq-stripprefix.stripprefix.prefixes=/management/rabbitmq/
+      - traefik.http.routers.rabbitmq.middlewares=rabbitmq-stripprefix
     networks:
       - traefik
 
@@ -97,8 +90,9 @@ networks:
   products:
     driver: bridge
   traefik:
-    driver: bridge
+    external: true
+    name: traefik
 
 volumes:
-  products-db:
+  productdb:
   pgadmin:
