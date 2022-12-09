@@ -28,6 +28,8 @@ services:
       - traefik.docker.network=traefik
       - traefik.http.routers.online-shop.rule=Host("${HOSTNAME}") && PathPrefix("/")
       - traefik.http.services.online-shop.loadbalancer.server.port=3000
+    environment:
+      NEXT_PUBLIC_HOSTNAME: ${HOSTNAME}
 
   productdb:
     image: postgres
