@@ -1,5 +1,5 @@
 services:
-  products:
+  product-service:
     build:
       context: products
       dockerfile: src/main/docker/Dockerfile.jvm
@@ -16,6 +16,24 @@ services:
       - traefik.http.services.products.loadbalancer.server.port=8080
       - traefik.http.middlewares.products-stripprefix.stripprefix.prefixes=/api/product-service
       - traefik.http.routers.products.middlewares=products-stripprefix
+
+  basket-service:
+    build:
+      context: basket
+      dockerfile: src/main/docker/Dockerfile.jvm
+    networks:
+      - traefik
+      - basket
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.basket.rule=Host("${HOSTNAME}") && PathPrefix("/api/basket-service")
+      - traefik.http.services.basket.loadbalancer.server.port=8080
+      - traefik.http.middlewares.basket-stripprefix.stripprefix.prefixes=/api/basket-service
+      - traefik.http.routers.basket.middlewares=basket-stripprefix
 
   online-shop:
     build:
@@ -44,6 +62,19 @@ services:
       - products
     restart: unless-stopped
 
+  basketdb:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: basket
+      PGDATA: /data/postgres
+    volumes:
+      - basketdb:/data/postgres
+    networks:
+      - basket
+    restart: unless-stopped
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -55,6 +86,7 @@ services:
     networks:
       - traefik
       - products
+      - basket
     restart: unless-stopped
     labels:
       - traefik.enable=true
@@ -64,7 +96,12 @@ services:
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      URLS: '[{ url: "/api/product-service/q/openapi", name: "Products" },]'
+      URLS: >
+        [
+          { url: "/api/product-service/q/openapi", name: "Products" }, 
+          { url: "/api/basket-service/q/openapi", name: "Basket" },
+        ]
+
       BASE_URL: /api/swagger-ui
     networks:
       - traefik
@@ -94,6 +131,8 @@ services:
     command: redis-server
 
 networks:
+  basket:
+    driver: bridge
   products:
     driver: bridge
   traefik:
@@ -102,4 +141,5 @@ networks:
 
 volumes:
   productdb:
+  basketdb:
   pgadmin:
