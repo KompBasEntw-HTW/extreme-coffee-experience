@@ -42,7 +42,6 @@ services:
       context: online-shop
       dockerfile: Dockerfile
       args:
-        HOSTNAME: ${HOSTNAME}
         POSITIONSTACK_API_KEY: ${POSITIONSTACK_API_KEY}
 
     networks:
