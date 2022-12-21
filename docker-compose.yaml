@@ -15,7 +15,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=traefik
       - traefik.http.routers.products.rule=Host("${HOSTNAME}") && PathPrefix("/api/product-service")
-      - traefik.http.services.products.loadbalancer.server.port=80
+      - traefik.http.services.products.loadbalancer.server.port=8080
       - traefik.http.middlewares.products-stripprefix.stripprefix.prefixes=/api/product-service
       - traefik.http.routers.products.middlewares=products-stripprefix
   basket-service:
