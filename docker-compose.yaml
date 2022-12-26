@@ -146,7 +146,7 @@ services:
       KC_HTTP_RELATIVE_PATH: /management/keycloak
       KC_HOSTNAME: ${HOSTNAME}
       KC_STORAGE: jpa
-      KC_PROXY: reencrypt
+      KC_PROXY: edge
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik

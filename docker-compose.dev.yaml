@@ -32,9 +32,9 @@ services:
       - traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-  keycloak:
-    command:
-      - start-dev
+  # keycloak:
+    # command:
+      # - start-dev
 
 
 networks:
