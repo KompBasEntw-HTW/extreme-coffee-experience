@@ -1,4 +1,5 @@
 services:
+  # Product service provides product data
   product-service:
     build:
       context: products
@@ -11,6 +12,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      KEYCLOAK_EXE_SECRET: ${KEYCLOAK_EXE_SECRET}
+      HOSTNAME: ${HOSTNAME}
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik
@@ -18,6 +21,7 @@ services:
       - traefik.http.services.products.loadbalancer.server.port=8080
       - traefik.http.middlewares.products-stripprefix.stripprefix.prefixes=/api/product-service
       - traefik.http.routers.products.middlewares=products-stripprefix
+  # Basket service manages baskets
   basket-service:
     build:
       context: basket
@@ -37,13 +41,13 @@ services:
       - traefik.http.services.basket.loadbalancer.server.port=8080
       - traefik.http.middlewares.basket-stripprefix.stripprefix.prefixes=/api/basket-service
       - traefik.http.routers.basket.middlewares=basket-stripprefix
+  # Web frontend
   online-shop:
     build:
       context: online-shop
       dockerfile: Dockerfile
       args:
         POSITIONSTACK_API_KEY: ${POSITIONSTACK_API_KEY}
-
     networks:
       - traefik
     labels:
@@ -51,6 +55,7 @@ services:
       - traefik.docker.network=traefik
       - traefik.http.routers.online-shop.rule=Host("${HOSTNAME}") && PathPrefix("/")
       - traefik.http.services.online-shop.loadbalancer.server.port=3000
+  # database for product service
   productdb:
     image: postgres
     environment:
@@ -63,6 +68,7 @@ services:
     networks:
       - products
     restart: unless-stopped
+  # database for basket service
   basketdb:
     image: postgres
     environment:
@@ -75,6 +81,7 @@ services:
     networks:
       - basket
     restart: unless-stopped
+  # database management tool
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -92,6 +99,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=traefik
       - traefik.http.routers.pgadmin.rule=Host("${HOSTNAME}") && PathPrefix("/management/pgadmin")
+  # api view tool 
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
@@ -104,6 +112,7 @@ services:
       - traefik.docker.network=traefik
       - traefik.http.routers.swagger-ui.rule=Host("${HOSTNAME}") && PathPrefix("/api/swagger-ui")
       - traefik.http.services.swagger-ui.loadbalancer.server.port=8080
+  # rabbitmq for messaging queues
   rabbitmq:
     image: rabbitmq:management
     environment:
@@ -121,15 +130,56 @@ services:
   cache:
     image: redis
     command: redis-server
+  # Keycloak server SSO system for bikelin provides auth capabilities
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    volumes:
+    - ./keywind/theme/keywind:/opt/keycloak/themes/keywind
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_DB_URL_HOST: keycloakdb
+      KC_DB_URL_DATABASE: keycloak
+      KC_HTTP_RELATIVE_PATH: /management/keycloak
+      KC_HOSTNAME: ${HOSTNAME}
+      KC_STORAGE: jpa
+      KC_PROXY: reencrypt
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.keycloak.rule=Host("${HOSTNAME}") && PathPrefix("/management/keycloak")
+      - traefik.http.services.keycloak.loadbalancer.server.port=8080
+    command:
+      - start
+    networks:
+      - keycloak
+      - traefik
+  # database for keycloak
+  keycloakdb:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: keycloak
+      PGDATA: /data/postgres
+    volumes:
+      - keycloakdb:/data/postgres
+    networks:
+      - keycloak
+    restart: unless-stopped
 networks:
   basket:
-    driver: bridge
   products:
-    driver: bridge
+  keycloak:
   traefik:
     external: true
     name: traefik
 volumes:
   productdb:
   basketdb:
+  keycloakdb:
+  userdb:
   pgadmin:
