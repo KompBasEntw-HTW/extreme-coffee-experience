@@ -17,5 +17,7 @@ jobs:
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
           echo "${{ secrets.POSITIONSTACK_API_KEY}}" >> .env
+          echo "${{ secrets.KEYCLOAK_ADMIN_USERNAME }}" >> .env
+          echo "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env
       - name: Deploy application
         run: sh run-prod.sh
