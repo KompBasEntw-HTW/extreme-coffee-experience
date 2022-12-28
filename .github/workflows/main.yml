@@ -19,6 +19,11 @@ jobs:
           echo "${{ secrets.POSITIONSTACK_API_KEY}}" >> .env
           echo "${{ secrets.KEYCLOAK_ADMIN_USERNAME }}" >> .env
           echo "${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env
-          echo "${{ secrets.KEYCLOAK_EXE_SECRET }}" >> .env
+          echo "${{ secrets.KEYCLOAK_PRODUCT_CLIENT_ID }}" >> .env
+          echo "${{ secrets.KEYCLOAK_PRODUCT_CLIENT_SECRET }}" >> .env
+          echo "${{ secrets.KEYCLOAK_NEXTAUTH_CLIENT_ID }}" >> .env
+          echo "${{ secrets.KEYCLOAK_NEXTAUTH_CLIENT_SECRET }}" >> .env
+          echo "${{ secrets.NEXTAUTH_URL }}" >> .env
+          echo "${{ secrets.NEXTAUTH_SECRET }}" >> .env
       - name: Deploy application
         run: sh run-prod.sh
