@@ -104,7 +104,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=traefik
       - traefik.http.routers.pgadmin.rule=Host("${HOSTNAME}") && PathPrefix("/management/pgadmin")
-  # api view tool 
+  # api view tool
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
@@ -139,7 +139,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak
     volumes:
-    - ./keywind/theme/keywind:/opt/keycloak/themes/keywind
+      - ./keywind/theme/keywind:/opt/keycloak/themes/keywind
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
