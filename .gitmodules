@@ -22,6 +22,3 @@
 	path = online-shop
 	url = git@github.com:KompBasEntw-HTW/online-shop.git
 	branch = main
-[submodule "keywind"]
-	path = keywind
-	url = git@github.com:lukin/keywind.git
