@@ -24,6 +24,8 @@ services:
       - traefik.http.routers.products.middlewares=products-stripprefix
   # Basket service manages baskets
   basket-service:
+    depends_on:
+      - keycloak
     build:
       context: basket
       dockerfile: src/main/docker/Dockerfile.jvm
@@ -47,6 +49,8 @@ services:
       - traefik.http.routers.basket.middlewares=basket-stripprefix
   # Web frontend
   online-shop:
+    depends_on:
+      - keycloak
     build:
       context: online-shop
       dockerfile: Dockerfile
