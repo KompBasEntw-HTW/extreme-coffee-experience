@@ -9,6 +9,11 @@ cd basket || exit 1
 ./gradlew build
 cd .. || exit 1
 
+# Build checkout service 
+cd checkout || exit 1
+./gradlew build
+cd .. || exit 1
+
 # Run docker compose
 docker compose --env-file ./.env.local -f docker-compose.yaml -f docker-compose.dev.yaml up -d --build
 

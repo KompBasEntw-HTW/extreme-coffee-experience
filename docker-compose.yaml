@@ -22,6 +22,29 @@ services:
       - traefik.http.services.products.loadbalancer.server.port=8080
       - traefik.http.middlewares.products-stripprefix.stripprefix.prefixes=/api/product-service
       - traefik.http.routers.products.middlewares=products-stripprefix
+  # Checkout service
+  checkout-service:
+    build:
+      context: checkout
+      dockerfile: src/main/docker/Dockerfile.jvm
+    networks:
+      - traefik
+      - checkout
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      KEYCLOAK_CHECKOUT_CLIENT_ID: ${KEYCLOAK_CHECKOUT_CLIENT_ID}
+      KEYCLOAK_CHECKOUT_CLIENT_SECRET: ${KEYCLOAK_CHECKOUT_CLIENT_SECRET}
+      HOSTNAME: ${HOSTNAME}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.checkout.rule=Host("${HOSTNAME}") && PathPrefix("/api/checkout-service")
+      - traefik.http.services.checkout.loadbalancer.server.port=8080
+      - traefik.http.middlewares.checkout-stripprefix.stripprefix.prefixes=/api/checkout-service
+      - traefik.http.routers.checkout.middlewares=checkout-stripprefix
   # Basket service manages baskets
   basket-service:
     depends_on:
@@ -92,6 +115,19 @@ services:
       - basketdb:/data/postgres
     networks:
       - basket
+    restart: unless-stopped
+  # database for checkout service
+  checkoutdb:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: checkout
+      PGDATA: /data/postgres
+    volumes:
+      - checkoutdb:/data/postgres
+    networks:
+      - checkout
     restart: unless-stopped
   # database management tool
   pgadmin:
@@ -184,12 +220,14 @@ services:
     restart: unless-stopped
 networks:
   basket:
+  checkout:
   products:
   keycloak:
   traefik:
     external: true
     name: traefik
 volumes:
+  checkoutdb:
   productdb:
   basketdb:
   keycloakdb:
