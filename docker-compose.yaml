@@ -142,6 +142,7 @@ services:
       - traefik
       - products
       - basket
+      - checkout
     restart: unless-stopped
     labels:
       - traefik.enable=true
@@ -151,7 +152,7 @@ services:
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
-      URLS: "[\n  { url: \"/api/product-service/q/openapi\", name: \"Products\" }, \n  { url: \"/api/basket-service/q/openapi\", name: \"Basket\" },\n]\n"
+      URLS: "[\n  { url: \"/api/product-service/q/openapi\", name: \"Products\" }, \n  { url: \"/api/checkout-service/q/openapi\", name: \"Checkout\" }, \n  { url: \"/api/basket-service/q/openapi\", name: \"Basket\" },\n]\n"
       BASE_URL: /api/swagger-ui
     networks:
       - traefik

@@ -18,6 +18,12 @@ services:
     ports:
       - 8082:8080
 
+  checkout-service:
+    environment:
+      QUARKUS_LAUNCH_DEVMODE: true
+    ports:
+      - 8083:8080
+
   reverse-proxy:
     image: traefik
     command:
