@@ -27,5 +27,7 @@ jobs:
           echo "${{ secrets.KEYCLOAK_BASKET_CLIENT_ID }}" >> .env
           echo "${{ secrets.NEXTAUTH_URL }}" >> .env
           echo "${{ secrets.NEXTAUTH_SECRET }}" >> .env
+          echo "${{ secrets.KEYCLOAK_CHECKOUT_CLIENT_SECRET}}" >> .env
+          echo "${{ secrets.KEYCLOAK_CHECKOUT_CLIENT_ID}}" >> .env
       - name: Deploy application
         run: sh run-prod.sh
