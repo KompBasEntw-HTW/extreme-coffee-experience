@@ -28,3 +28,9 @@ if [ "$1" = "basket" ]; then
   cd basket || exit 1
   ./gradlew quarkusRemoteDev
 fi
+
+# If basket service is specified connect dev server to docker container
+if [ "$1" = "checkout" ]; then
+  cd checkout || exit 1
+  ./gradlew quarkusRemoteDev
+fi
