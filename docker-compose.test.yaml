@@ -1,0 +1,43 @@
+services:
+  online-shop:
+    build:
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./online-shop:/app
+      - /app/node_modules
+
+  product-service:
+    build:
+      dockerfile: src/main/docker/Dockerfile.test.jvm
+
+  basket-service:
+    build:
+      dockerfile: src/main/docker/Dockerfile.test.jvm
+
+  checkout-service:
+    build:
+      dockerfile: src/main/docker/Dockerfile.test.jvm
+
+  reverse-proxy:
+    image: traefik
+    command:
+      - --api.insecure=true
+      # - --log.level=DEBUG
+      - --providers.docker=true
+      - --log.format=json
+    ports:
+      - 80:80
+      - 8080:8080
+    networks:
+      - traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  keycloak:
+    command:
+      - start-dev
+
+
+networks:
+  traefik:
+    driver: bridge
+    name: traefik
