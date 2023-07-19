@@ -18,14 +18,19 @@ services:
   basket-service:
     environment:
       QUARKUS_LAUNCH_DEVMODE: true
+      JAVA_DEBUG: true
+      JAVA_DEBUG_PORT: "*:5005" 
     ports:
       - 8082:8080
 
   checkout-service:
     environment:
       QUARKUS_LAUNCH_DEVMODE: true
+      JAVA_DEBUG: true
+      JAVA_DEBUG_PORT: "*:5005" 
     ports:
       - 8083:8080
+      # - 5005:5005
 
   reverse-proxy:
     image: traefik
