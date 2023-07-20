@@ -22,6 +22,7 @@ services:
       - traefik.http.services.products.loadbalancer.server.port=8080
       - traefik.http.middlewares.products-stripprefix.stripprefix.prefixes=/api/product-service
       - traefik.http.routers.products.middlewares=products-stripprefix
+    restart: unless-stopped
   # Checkout service
   checkout-service:
     build:
@@ -45,6 +46,7 @@ services:
       - traefik.http.services.checkout.loadbalancer.server.port=8080
       - traefik.http.middlewares.checkout-stripprefix.stripprefix.prefixes=/api/checkout-service
       - traefik.http.routers.checkout.middlewares=checkout-stripprefix
+    restart: unless-stopped
   # Basket service manages baskets
   basket-service:
     depends_on:
@@ -70,6 +72,7 @@ services:
       - traefik.http.services.basket.loadbalancer.server.port=8080
       - traefik.http.middlewares.basket-stripprefix.stripprefix.prefixes=/api/basket-service
       - traefik.http.routers.basket.middlewares=basket-stripprefix
+    restart: unless-stopped
   # Web frontend
   online-shop:
     depends_on:
@@ -90,6 +93,7 @@ services:
       - traefik.docker.network=traefik
       - traefik.http.routers.online-shop.rule=Host("${HOSTNAME}") && PathPrefix("/")
       - traefik.http.services.online-shop.loadbalancer.server.port=3000
+    restart: unless-stopped
   # database for product service
   productdb:
     image: postgres
