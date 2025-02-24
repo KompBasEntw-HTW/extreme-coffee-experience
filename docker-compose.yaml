@@ -1,9 +1,7 @@
 services:
   # Product service provides product data
   product-service:
-    build:
-      context: products
-      dockerfile: src/main/docker/Dockerfile.jvm
+    image: localhost:7000/product-service:v1.0.0
     networks:
       - traefik
       - products
@@ -27,9 +25,7 @@ services:
     restart: unless-stopped
   # Checkout service
   checkout-service:
-    build:
-      context: checkout
-      dockerfile: src/main/docker/Dockerfile.jvm
+    image: localhost:7000/checkout-service:v1.0.0
     networks:
       - traefik
       - checkout
@@ -55,9 +51,7 @@ services:
   basket-service:
     depends_on:
       - keycloak
-    build:
-      context: basket
-      dockerfile: src/main/docker/Dockerfile.jvm
+    image: localhost:7000/basket-service:v1.0.0
     networks:
       - traefik
       - basket
@@ -83,16 +77,14 @@ services:
   online-shop:
     depends_on:
       - keycloak
-    build:
-      context: online-shop
-      dockerfile: Dockerfile
-      args:
-        POSITIONSTACK_API_KEY: ${POSITIONSTACK_API_KEY}
-        AUTH_SECRET: ${AUTH_SECRET}
-        AUTH_KEYCLOAK_ID: ${AUTH_KEYCLOAK_ID}
-        AUTH_KEYCLOAK_SECRET: ${AUTH_KEYCLOAK_SECRET}
-        AUTH_KEYCLOAK_ISSUER: ${AUTH_KEYCLOAK_ISSUER}
-        AUTH_URL: ${AUTH_URL}
+    image: localhost:7000/online-shop:v1.2.0
+    environment:
+      POSITIONSTACK_API_KEY: ${POSITIONSTACK_API_KEY}
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_KEYCLOAK_ID: ${AUTH_KEYCLOAK_ID}
+      AUTH_KEYCLOAK_SECRET: ${AUTH_KEYCLOAK_SECRET}
+      AUTH_KEYCLOAK_ISSUER: ${AUTH_KEYCLOAK_ISSUER}
+      AUTH_URL: ${AUTH_URL}
     networks:
       - traefik
     labels:
