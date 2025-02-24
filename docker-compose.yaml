@@ -14,14 +14,16 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       KEYCLOAK_PRODUCT_CLIENT_ID: ${KEYCLOAK_PRODUCT_CLIENT_ID}
       KEYCLOAK_PRODUCT_CLIENT_SECRET: ${KEYCLOAK_PRODUCT_CLIENT_SECRET}
-      HOSTNAME: ${HOSTNAME}
+      HOSTNAME: ${DOMAIN_NAME}
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik
-      - traefik.http.routers.products.rule=Host("${HOSTNAME}") && PathPrefix("/api/product-service")
       - traefik.http.services.products.loadbalancer.server.port=8080
       - traefik.http.middlewares.products-stripprefix.stripprefix.prefixes=/api/product-service
+      - traefik.http.routers.products.rule=Host("${DOMAIN_NAME}") && PathPrefix("/api/product-service")
       - traefik.http.routers.products.middlewares=products-stripprefix
+      - traefik.http.routers.products.tls=true
+      - traefik.http.routers.products.tls.certresolver=cloudflare-resolver
+      - traefik.http.routers.products.entrypoints=websecure
+      - traefik.http.routers.products.middlewares=compressor@docker,products-stripprefix
     restart: unless-stopped
   # Checkout service
   checkout-service:
@@ -38,14 +40,16 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       KEYCLOAK_CHECKOUT_CLIENT_ID: ${KEYCLOAK_CHECKOUT_CLIENT_ID}
       KEYCLOAK_CHECKOUT_CLIENT_SECRET: ${KEYCLOAK_CHECKOUT_CLIENT_SECRET}
-      HOSTNAME: ${HOSTNAME}
+      HOSTNAME: ${DOMAIN_NAME}
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik
-      - traefik.http.routers.checkout.rule=Host("${HOSTNAME}") && PathPrefix("/api/checkout-service")
       - traefik.http.services.checkout.loadbalancer.server.port=8080
       - traefik.http.middlewares.checkout-stripprefix.stripprefix.prefixes=/api/checkout-service
+      - traefik.http.routers.checkout.rule=Host("${DOMAIN_NAME}") && PathPrefix("/api/checkout-service")
       - traefik.http.routers.checkout.middlewares=checkout-stripprefix
+      - traefik.http.routers.checkout.tls=true
+      - traefik.http.routers.checkout.tls.certresolver=cloudflare-resolver
+      - traefik.http.routers.checkout.entrypoints=websecure
+      - traefik.http.routers.checkout.middlewares=compressor@docker,checkout-stripprefix
     restart: unless-stopped
   # Basket service manages baskets
   basket-service:
@@ -64,14 +68,16 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       KEYCLOAK_BASKET_CLIENT_ID: ${KEYCLOAK_BASKET_CLIENT_ID}
       KEYCLOAK_BASKET_CLIENT_SECRET: ${KEYCLOAK_BASKET_CLIENT_SECRET}
-      HOSTNAME: ${HOSTNAME}
+      HOSTNAME: ${DOMAIN_NAME}
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik
-      - traefik.http.routers.basket.rule=Host("${HOSTNAME}") && PathPrefix("/api/basket-service")
       - traefik.http.services.basket.loadbalancer.server.port=8080
       - traefik.http.middlewares.basket-stripprefix.stripprefix.prefixes=/api/basket-service
+      - traefik.http.routers.basket.rule=Host("${DOMAIN_NAME}") && PathPrefix("/api/basket-service")
       - traefik.http.routers.basket.middlewares=basket-stripprefix
+      - traefik.http.routers.basket.tls=true
+      - traefik.http.routers.basket.tls.certresolver=cloudflare-resolver
+      - traefik.http.routers.basket.entrypoints=websecure
+      - traefik.http.routers.basket.middlewares=compressor@docker, basket-stripprefix
     restart: unless-stopped
   # Web frontend
   online-shop:
@@ -86,13 +92,16 @@ services:
         AUTH_KEYCLOAK_ID: ${AUTH_KEYCLOAK_ID}
         AUTH_KEYCLOAK_SECRET: ${AUTH_KEYCLOAK_SECRET}
         AUTH_KEYCLOAK_ISSUER: ${AUTH_KEYCLOAK_ISSUER}
+        AUTH_URL: ${AUTH_URL}
     networks:
       - traefik
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik
-      - traefik.http.routers.online-shop.rule=Host("${HOSTNAME}") && PathPrefix("/")
       - traefik.http.services.online-shop.loadbalancer.server.port=3000
+      - traefik.http.routers.online-shop.rule=Host("${DOMAIN_NAME}") && PathPrefix("/")
+      - traefik.http.routers.online-shop.tls=true
+      - traefik.http.routers.online-shop.tls.certresolver=cloudflare-resolver
+      - traefik.http.routers.online-shop.entrypoints=websecure
+      - traefik.http.routers.online-shop.middlewares=compressor@docker
     restart: unless-stopped
   # database for product service
   productdb:
@@ -149,9 +158,11 @@ services:
       - checkout
     restart: unless-stopped
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik
-      - traefik.http.routers.pgadmin.rule=Host("${HOSTNAME}") && PathPrefix("/management/pgadmin")
+      - traefik.http.routers.pgadmin.rule=Host("${DOMAIN_NAME}") && PathPrefix("/management/pgadmin")
+      - traefik.http.routers.pgadmin.tls=true
+      - traefik.http.routers.pgadmin.tls.certresolver=cloudflare-resolver
+      - traefik.http.routers.pgadmin.entrypoints=websecure
+      - traefik.http.routers.pgadmin.middlewares=compressor@docker
   # api view tool
   swagger-ui:
     image: swaggerapi/swagger-ui
@@ -161,10 +172,12 @@ services:
     networks:
       - traefik
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik
-      - traefik.http.routers.swagger-ui.rule=Host("${HOSTNAME}") && PathPrefix("/api/swagger-ui")
       - traefik.http.services.swagger-ui.loadbalancer.server.port=8080
+      - traefik.http.routers.swagger-ui.rule=Host("${DOMAIN_NAME}") && PathPrefix("/api/swagger-ui")
+      - traefik.http.routers.swagger-ui.tls=true
+      - traefik.http.routers.swagger-ui.tls.certresolver=cloudflare-resolver
+      - traefik.http.routers.swagger-ui.entrypoints=websecure
+      - traefik.http.routers.swagger-ui.middlewares=compressor@docker
   # rabbitmq for messaging queues
   rabbitmq:
     image: rabbitmq:management
@@ -172,12 +185,14 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik
-      - traefik.http.routers.rabbitmq.rule=Host("${HOSTNAME}") && PathPrefix("/management/rabbitmq/")
       - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
       - traefik.http.middlewares.rabbitmq-stripprefix.stripprefix.prefixes=/management/rabbitmq/
+      - traefik.http.routers.rabbitmq.rule=Host("${DOMAIN_NAME}") && PathPrefix("/management/rabbitmq/")
       - traefik.http.routers.rabbitmq.middlewares=rabbitmq-stripprefix
+      - traefik.http.routers.rabbitmq.tls=true
+      - traefik.http.routers.rabbitmq.tls.certresolver=cloudflare-resolver
+      - traefik.http.routers.rabbitmq.entrypoints=websecure
+      - traefik.http.routers.rabbitmq.middlewares=compressor@docker,rabbitmq-stripprefix
     networks:
       - traefik
   cache:
@@ -197,13 +212,13 @@ services:
       KC_DB_URL_HOST: keycloakdb
       KC_DB_URL_DATABASE: keycloak
       KC_HTTP_RELATIVE_PATH: /management/keycloak
-      KC_HOSTNAME: ${HOSTNAME}
+      KC_HOSTNAME: ${DOMAIN_NAME}
       KC_STORAGE: jpa
       KC_PROXY: edge
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik
-      - traefik.http.routers.keycloak.rule=Host("${HOSTNAME}") && PathPrefix("/management/keycloak")
+      - traefik.http.routers.keycloak.rule=Host("${DOMAIN_NAME}") && PathPrefix("/management/keycloak")
       - traefik.http.services.keycloak.loadbalancer.server.port=8080
     command:
       - start

@@ -3,8 +3,7 @@ services:
     build:
       dockerfile: Dockerfile.dev
     volumes:
-      - ./online-shop:/app
-      - /app/node_modules
+      - ./online-shop/src:/app/src
   product-service:
     environment:
       QUARKUS_LAUNCH_DEVMODE: true

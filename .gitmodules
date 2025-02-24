@@ -1,28 +1,21 @@
 [submodule "basket"]
 	path = basket
 	url = git@github.com:KompBasEntw-HTW/basket.git
-	branch = main
 [submodule "user"]
 	path = user
 	url = git@github.com:KompBasEntw-HTW/user.git
-	branch = main
 [submodule "payment"]
 	path = payment
 	url = git@github.com:KompBasEntw-HTW/payment.git
-	branch = main
 [submodule "checkout"]
 	path = checkout
 	url = git@github.com:KompBasEntw-HTW/checkout.git
-	branch = main
 [submodule "products"]
 	path = products
 	url = git@github.com:KompBasEntw-HTW/products.git
-	branch = main
 [submodule "online-shop"]
 	path = online-shop
 	url = git@github.com:KompBasEntw-HTW/online-shop.git
-	branch = main
 [submodule "keywind"]
 	path = keywind
 	url = git@github.com:KompBasEntw-HTW/keywind.git
-  branch = main
